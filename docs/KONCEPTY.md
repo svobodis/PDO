@@ -1,49 +1,33 @@
-# Technické koncepty a architektura
+# Technické koncepty a architektonická rozhodnutí
 
-Tento dokument vysvětluje vnitřní logiku Turnajového systému, architekturu aplikace a způsob správy dat. Porozumění těmto konceptům je nezbytné pro případné rozšiřování systému nebo jeho údržbu.
+Tento dokument vysvětluje vnitřní logiku systému, datové toky a technická rozhodnutí učiněná během vývoje.
 
-## 1. Architektura Klient-Server
+## 1. Datový model a referenční integrita
+Systém využívá relační databázi spravovanou skrze SQLAlchemy ORM. Architektura dat je navržena tak, aby byla zajištěna konzistence i při dynamických změnách turnaje.
 
-Systém využívá moderní architekturu rozdělenou na dvě nezávislé vrstvy komunikující prostřednictvím bezestavového rozhraní REST API.
+- Hierarchie entit: `Tournament` -> `Group` -> `Team` -> `Match`.
+- Entita `Match` je klíčovým propojovacím prvkem, který drží reference na dva týmy, konkrétní hřiště (`Field`) a časový slot.
+- Referenční integrita: Smazání skupiny vede k uvolnění týmů do stavu bez přiřazení (group_id = NULL), nikoliv k jejich smazání.
 
-### 1.1 Klientská část (Frontend)
-Frontend je realizován jako Single Page Application (SPA) v knihovně React.
-* **Zodpovědnost:** Vykreslování uživatelského rozhraní, validace vstupů na straně klienta a správa lokálního stavu.
-* **Komunikace:** Klient odesílá asynchronní HTTP požadavky na server a zpracovává odpovědi ve formátu JSON.
-* **Výhoda:** Plynulý uživatelský zážitek bez nutnosti opětovného načítání celé stránky při každé interakci.
+## 2. Logika generování herních systémů
+Aplikace deleguje tvorbu zápasů na specializované generátory ve složce `backend/generators/`. Každý systém má vlastní matematickou logiku:
 
-### 1.2 Serverová část (Backend)
-Backend běží na frameworku Flask (Python).
-* **Zodpovědnost:** Implementace herní logiky, algoritmy pro rozlosování zápasů, komunikace s databází a zabezpečení dat.
-* **Bezestavovost:** Server neukládá informace o relaci (session). Každý požadavek musí obsahovat všechny informace potřebné k jeho vyřízení (např. Admin Token).
+- Round Robin (Každý s každým): Implementuje algoritmus zajišťující, že se každý tým utká s každým právě jednou.
+- Knockout (Vyřazovací systém): Generuje strukturu s pevnými vazbami `next_match_id`. Vítěz zápasu je logikou backendu automaticky posouván do následujícího kola.
+- Heuristika rozvrhování: Systém využívá "hladový" algoritmus, který iteruje nad množinou nezařazených zápasů a hledá pro ně nejbližší volný slot při dodržení kolizních podmínek (tým nemůže hrát dva zápasy najednou).
 
-## 2. Správa přístupů bez registrace
+## 3. State Management na frontendu
+Frontendová aplikace v Reactu nevyužívá pro správu dat lokální stavy jednotlivých komponent, ale centralizovaný `TournamentProvider`.
 
-Unikátním konceptem systému je absence klasických uživatelských účtů. Toto řešení maximalizuje rychlost nasazení turnaje v terénu.
+- Výhody: Jakákoliv komponenta (např. editace výsledku) má okamžitý přístup k globálním datům turnaje bez nutnosti předávání parametrů (prop drilling).
+- Asynchronní operace: Veškerá komunikace s API je zapouzdřena do `useCallback` funkcí v rámci kontextu, což optimalizuje výkon a zabraňuje zbytečnému překreslování UI.
 
-### 2.1 Admin Token
-Při vytvoření turnaje systém vygeneruje unikátní tajný klíč (token).
-* **Funkce:** Token slouží jako autorizační prvek pro veškeré zápisové operace (CRUD).
-* **Uložení:** Token je automaticky uložen v Local Storage prohlížeče organizátora. Tím je zajištěno, že při zavření prohlížeče nedojde ke ztrátě přístupu.
-* **Záchrana přístupu:** Pro administraci z jiného zařízení musí uživatel tento token ručně přenést (např. pomocí funkce Načíst turnaj).
+## 4. Strategie synchronizace (Polling)
+Vzhledem k požadavku na živé výsledky v diváckém režimu bez nutnosti registrace uživatelů k odběru novinek (WebSockets) byla zvolena strategie "Short Polling".
+- Komponenta `PublicView` v pravidelném pětisekundovém intervalu vyvolává asynchronní dotaz na endpoint `/api/tournaments/<uuid>`.
+- Tento přístup zajišťuje vysokou kompatibilitu se staršími mobilními prohlížeči a minimalizuje režii spojenou s udržováním trvalého spojení na serveru.
 
-### 2.2 Public UUID
-Veřejný identifikátor slouží pro sdílení dat s diváky.
-* **Omezení:** Rozhraní přístupné přes UUID blokuje veškeré editační prvky.
-* **Bezpečnost:** API na straně serveru odmítne jakýkoliv požadavek na změnu dat, pokud není doprovázen platným Admin Tokenem, i když útočník zná Public UUID.
-
-## 3. Relační datový model
-
-Data jsou organizována v relační struktuře, která zrcadlí hierarchii sportovní události.
-
-### 3.1 Entity a vazby
-* **Turnaj (Tournament):** Kořenová entita obsahující globální nastavení a oba přístupové klíče.
-* **Tým (Team):** Entita vázaná na konkrétní turnaj (vazba 1:N). Obsahuje název a referenci na logo.
-* **Skupina (Group):** Logický prvek pro herní systémy typu "základní skupiny". Propojuje týmy a definuje jejich vzájemné pořadí.
-* **Zápas (Match):** Centrální entita propojující dva týmy, čas konání a výsledek. Zápas je vždy součástí turnaje a volitelně konkrétní skupiny.
-
-### 3.2 Algoritmus rozlosování
-Algoritmus generuje harmonogram tak, aby splnil tři kritéria:
-1. Žádný tým nehraje více zápasů v jeden čas.
-2. V jeden moment neprobíhá více zápasů, než kolik je dostupných hřišť.
-3. Jsou dodrženy minimální přestávky mezi zápasy stejného týmu pro regeneraci hráčů.
+## 5. Zpracování médií (Cloudinary Pipeline)
+Nahrávání logotypů týmů nezatěžuje aplikační server binárními daty.
+- Pipeline: Frontend odešle soubor na backend -> backend využije Cloudinary SDK pro upload -> Cloudinary provede transformaci (ořez 200x200px, optimalizace kvality) -> backend uloží pouze výslednou URL adresu.
+- Výsledek: Rychlé načítání diváckého pohledu díky distribuci obrázků přes globální síť CDN.
