@@ -16,6 +16,9 @@ Systém vygeneruje turnaj a zobrazí ovládací panel správce.
 
 > **TIP:** Chcete-li mít zálohu přístupu, zkopírujte si zobrazený Admin Token na bezpečné místo.
 
+![Úvodní obrazovka](images/start_dashboard.png)
+*Obrázek 1: Úvodní obrazovka pro vyvoření turnaje.*
+
 ## 2. Správa účastníků
 
 **Než začnete:** Zajistěte si seznam všech přihlášených týmů.
@@ -28,6 +31,9 @@ Pro přidání týmů do systému:
 5. Chcete-li přidat logo, klikněte na ikonu obrázku u názvu týmu a vyberte soubor z disku.
 Seznam všech týmů vidíte v přehledné tabulce ve spodní části obrazovky.
 
+![Správa týmů](images/teams.png)
+*Obrázek 2: Obrazovka pro přidání týmů.*
+
 ## 3. Vygenerování harmonogramu
 
 **Než začnete:** Ověřte, že jsou v systému zavedeny všechny týmy. Po vygenerování rozvrhu již nelze měnit počet účastníků.
@@ -38,6 +44,8 @@ Pro vytvoření časového plánu:
 3. Stiskněte tlačítko **Vygenerovat harmonogram**.
 4. Prohlédněte si vytvořený plán zápasů.
 Systém automaticky přidělí zápasy na hřiště tak, aby nedocházelo k časovým kolizím týmů.
+
+
 
 ## 4. Živý přenos a evidence výsledků
 
@@ -52,12 +60,19 @@ Pro průběžný zápis skóre právě hraného zápasu:
 4. Pomocí ovládacích prvků (např. tlačítek **+** a **-** nebo přímým přepisem) průběžně měňte stav obou týmů.
 Změny se automaticky v reálném čase propisují všem sledujícím divákům na jejich zařízeních.
 
+![Divácký pohled](images/mobile_results.png)
+*Obrázek 3: Divácký pohled na výsledky turnaje.*
+
 Chcete-li zápas oficiálně ukončit:
 1. Zkontrolujte, zda zobrazené skóre odpovídá finálnímu stavu utkání.
 2. Stiskněte tlačítko **Ukončit zápas** (nebo **Uložit výsledek**).
 Průběžné tabulky a celkové pořadí se okamžitě přepočítají.
 
-> **VAROVÁNÍ:** Uložení finálního výsledku a ukončení zápasu je nevratný krok, který může automaticky spustit generování další fáze turnaje (např. vyřazovacího pavouka). Před potvrzením konce utkání data pečlivě zkontrolujte.
+> **VAROVÁNÍ:** Předčasné ukončení zápasu.
+Ukončení zápasu je nevratná operace, která u vyřazovacího formátu ihned posune vítěze do dalšího kola. Neukončujte zápas před jeho skutečným koncem.
+
+![Správa výsledků](images/results.png)
+*Obrázek 4: Administrátorské rozhraní pro zadávání výsledků.*
 
 ## 5. Ukončení turnaje a vyhlášení
 
@@ -69,3 +84,6 @@ Pro vygenerování výstupů:
 3. Stiskněte tlačítko **Generovat diplomy**.
 4. Uložte vytvořený ZIP PDF souborů do svého zařízení.
 Diplomy jsou připraveny k okamžitému tisku a obsahují názvy týmů i jejich umístění.
+
+![Generování diplomů](images/diplomas.png)
+*Obrázek 5: Konečná funkce vygenerování diplomů pro všechny zúčastněné týmy.*

@@ -1,39 +1,37 @@
-# Analýza projektu
+# Analýza projektu a specifikace požadavků
 
-Tento dokument obsahuje analýzu cílové skupiny, mapu uživatelských činností a definici základních pojmů Turnajového systému.
+Tento dokument definuje cíle projektu, charakteristiku uživatelů a technické požadavky na Turnajový systém. Analýza slouží jako podklad pro návrh architektury a následnou implementaci.
 
-## 1. Analýza cílové skupiny
+## 1. Cíle projektu
+Hlavním cílem je vytvořit platformu pro správu amatérských sportovních turnajů, která eliminuje administrativní zátěž organizátora spojenou s tvorbou harmonogramů a distribucí výsledků. Systém klade důraz na nulovou bariéru vstupu (není vyžadována registrace) a okamžitou odezvu.
 
-### 1.1 Charakteristika uživatele
-Hlavním uživatelem systému je organizátor sportovní události (trenér, učitel, dobrovolník).
-* **Odbornost:** Běžná uživatelská znalost práce s webovým prohlížečem.
-* **Psychologický stav:** Uživatel se nachází ve stresu, v časové tísni a vyžaduje okamžité vyřešení problému bez studia dlouhých manuálů.
-* **Cíl:** Chce rychle vytvořit rozpis zápasů a průběžně zadávat výsledky na mobilním zařízení.
+## 2. Analýza aktérů (Stakeholders)
 
-### 1.2 Podmínky užití
-Aplikace je určena pro nasazení přímo v dějišti turnaje (sportovní haly, hřiště).
-* **Zařízení:** Primárně mobilní telefony a tablety.
-* **Vnější vlivy:** Hluk, omezená pozornost uživatele, potřeba rychlého zápisu.
+### 2.1 Organizátor (Administrátor)
+Uživatel zodpovědný za založení turnaje a jeho průběh.
+- Kontext: Často se nachází v terénu, používá mobilní zařízení, pracuje pod časovým tlakem.
+- Potřeby: Rychlé zadávání dat, automatické generování rozpisů, export tiskových podkladů.
 
-## 2. Mapa činností (Use Case)
+### 2.2 Divák (Veřejný uživatel)
+Pasivní uživatel sledující průběh události.
+- Kontext: Sleduje výsledky na vlastním zařízení (BYOD - Bring Your Own Device).
+- Potřeby: Okamžitý přístup k aktuálnímu skóre a tabulkám bez nutnosti interakce.
 
-### 2.1 Role: Administrátor (Organizátor)
-Správce turnaje disponuje oprávněním k zápisu a modifikaci dat.
-* **Založení turnaje:** Definice názvu, typu sportu a volba herního systému.
-* **Správa účastníků:** Přidávání týmů a nahrávání log.
-* **Generování harmonogramu:** Automatizované vytvoření časového plánu zápasů.
-* **Záznam výsledků:** Průběžné zadávání skóre odehraných utkání.
-* **Vyhlášení výsledků:** Export účastnických diplomů ve formátu PDF.
+## 3. Funkční požadavky (FR)
+- FR-01: Systém umožní vytvořit turnaj pro sporty Fotbal a Házená.
+- FR-02: Podpora herních systémů: Každý s každým, Skupinový, Vyřazovací pavouk a Kombinovaný systém.
+- FR-03: Automatické generování bezkolizního harmonogramu zápasů na základě počtu hřišť.
+- FR-04: Živý zápis výsledků s okamžitou synchronizací do diváckého pohledu.
+- FR-05: Správa týmů včetně nahrávání grafických logotypů.
+- FR-06: Export účastnických diplomů ve formátu PDF.
 
-### 2.2 Role: Divák
-Divák přistupuje k informacím v režimu pouze pro čtení (Read-only).
-* **Sledování rozpisu:** Prohlížení plánovaných časů a hřišť.
-* **Kontrola tabulek:** Sledování průběžného pořadí a výsledků.
+## 4. Nefunkční požadavky (NFR)
+- NFR-01: Dostupnost: Webové rozhraní musí být plně responzivní (Mobile-First).
+- NFR-02: Bezpečnost: Modifikace dat je povolena pouze držiteli unikátního administrátorského tokenu.
+- NFR-03: Výkon: Aktualizace diváckého pohledu musí probíhat v intervalu maximálně 5 sekund.
+- NFR-04: Perzistence: Systém musí uchovávat historii nedávno navštívených turnajů v lokálním úložišti prohlížeče.
 
-## 3. Slovník pojmů
-
-* **Admin Token:** Tajný identifikátor umožňující administrátorský přístup k turnaji.
-* **Public UUID:** Veřejný identifikátor určený pro sdílení výsledků s diváky.
-* **Harmonogram:** Časový a prostorový plán zápasů turnaje.
-* **Pavouk:** Grafické znázornění vyřazovací části turnaje (Play-off).
-* **Hrací systém:** Způsob utkání (např. každý s každým, skupinový systém).
+## 5. Uživatelské scénáře (User Stories)
+- Jako organizátor chci přidat 10 týmů a nechat je náhodně rozlosovat do dvou skupin, abych ušetřil čas s přípravou.
+- Jako divák chci na svém telefonu vidět, na kterém hřišti hraje můj oblíbený tým, abych stihl začátek zápasu.
+- Jako trenér chci po skončení turnaje vygenerovat diplomy pro první tři místa přímo z aplikace.
