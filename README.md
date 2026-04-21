@@ -24,7 +24,7 @@ Zdrojové kódy jsou rozděleny podle architektury Klient-Server:
 
 ## Rozcestník dokumentace
 Pro detailní pochopení systému využijte následující dokumenty:
-* [Analýza a Use Case](docs/ANALYZA.md): Popis cílové skupiny a mapu činností uživatelů.
+* [Analýza](docs/ANALYZA.md): Popis cílové skupiny.
 * [Koncepty a architektura](docs/KONCEPTY.md): Vysvětlení správy přístupů bez registrace a datového modelu.
 * [Příručka organizátora](docs/PRIRUCKA_ORGANIZATORA.md): Návod pro koncové uživatele.
 * [Instalační příručka](docs/INSTALACE_A_DEV.md): Postup pro lokální zprovoznění vývojového prostředí.
